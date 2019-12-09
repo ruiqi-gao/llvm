@@ -90,9 +90,9 @@ RT::PiProgram ProgramManager::getBuiltOpenCLProgram(OSModuleHandle M,
   std::shared_ptr<context_impl> Ctx = getSyclObjImpl(Context);
   std::map<OSModuleHandle, RT::PiProgram> &CachedPrograms =
       Ctx->getCachedPrograms();
-  auto It = CachedPrograms.find(M);
-  if (It != CachedPrograms.end())
-    return It->second;
+  //auto It = CachedPrograms.find(M);
+  //if (It != CachedPrograms.end())
+  //  return It->second;
 
   DeviceImage *Img = nullptr;
   using PiProgramT = remove_pointer_t<RT::PiProgram>;
