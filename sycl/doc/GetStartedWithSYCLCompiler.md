@@ -78,7 +78,7 @@ make -j`nproc` sycl-toolchain
 **Windows (64-bit)**
 ```bat
 cd %SYCL_HOME%
-git clone https://github.com/intel/llvm -b sycl
+git clone https://gitlab.devtools.intel.com/shqa/llvm.git -b jupyter-patch
 mkdir %SYCL_HOME%\build
 cd %SYCL_HOME%\build
 
