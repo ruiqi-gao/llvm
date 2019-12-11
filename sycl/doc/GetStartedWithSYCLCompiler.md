@@ -6,17 +6,23 @@ OpenCL&trade; API to offload computations to accelerators.
 
 # Table of contents
 
-* [Prerequisites](#prerequisites)
-  * [Create SYCL workspace](#create-sycl-workspace)
-* [Build SYCL toolchain](#build-sycl-toolchain)
-  * [Build SYCL toolchain with libc++ library](#build-sycl-toolchain-with-libc-library)
-* [Use SYCL toolchain](#use-sycl-toolchain)
-  * [Install low level runtime](#install-low-level-runtime)
-  * [Test SYCL toolchain](#test-sycl-toolchain)
-  * [Run simple SYCL application](#run-simple-sycl-application)
-* [C++ standard](#c-standard)
-* [Known Issues and Limitations](#known-issues-and-limitations)
-* [Find More](#find-more)
+- [Overview](#overview)
+- [Table of contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+  - [Create SYCL workspace](#create-sycl-workspace)
+- [Build SYCL toolchain](#build-sycl-toolchain)
+  - [Build SYCL toolchain with libc++ library](#build-sycl-toolchain-with-libc-library)
+- [Use SYCL toolchain](#use-sycl-toolchain)
+  - [Install low level runtime](#install-low-level-runtime)
+  - [Test SYCL toolchain](#test-sycl-toolchain)
+    - [Run regression tests](#run-regression-tests)
+    - [Run Khronos SYCL conformance test suite (optional)](#run-khronos-sycl-conformance-test-suite-optional)
+    - [Build Doxygen documentation](#build-doxygen-documentation)
+  - [Run simple SYCL application](#run-simple-sycl-application)
+  - [Code the program for a specific GPU](#code-the-program-for-a-specific-gpu)
+- [C++ standard](#c-standard)
+- [Known Issues and Limitations](#known-issues-and-limitations)
+- [Find More](#find-more)
 
 # Prerequisites
 
@@ -26,8 +32,6 @@ OpenCL&trade; API to offload computations to accelerators.
 * C++ compiler
   * Linux: `GCC` version 5.1.0 or later (including libstdc++) -
     https://gcc.gnu.org/install/
-  * Windows: `Visual Studio` version 15.7 preview 4 or later -
-    https://visualstudio.microsoft.com/downloads/
 
 ## Create SYCL workspace
 
@@ -42,19 +46,6 @@ export SYCL_HOME=/export/home/sycl_workspace
 mkdir $SYCL_HOME
 ```
 
-**Windows (64-bit)**
-
-Open a developer command prompt using one of two methods:
-
-- Click start menu and search for "**x64** Native Tools Command Prompt for VS XXXX", where
-  XXXX is a version of installed Visual Studio.
-- Ctrl-R, write "cmd", click enter, then run
-  `"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x64`
-
-```bat
-set SYCL_HOME=%USERPROFILE%\sycl_workspace
-mkdir %SYCL_HOME%
-```
 
 # Build SYCL toolchain
 
@@ -75,23 +66,6 @@ $SYCL_HOME/llvm/llvm
 make -j`nproc` sycl-toolchain
 ```
 
-**Windows (64-bit)**
-```bat
-cd %SYCL_HOME%
-git clone https://gitlab.devtools.intel.com/shqa/llvm.git -b jupyter-patch
-mkdir %SYCL_HOME%\build
-cd %SYCL_HOME%\build
-
-cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="X86" ^
--DLLVM_EXTERNAL_PROJECTS="llvm-spirv;sycl" ^
--DLLVM_ENABLE_PROJECTS="clang;llvm-spirv;sycl" ^
--DLLVM_EXTERNAL_SYCL_SOURCE_DIR="%SYCL_HOME%\llvm\sycl" ^
--DLLVM_EXTERNAL_LLVM_SPIRV_SOURCE_DIR="%SYCL_HOME%\llvm\llvm-spirv" ^
--DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl ^
-"%SYCL_HOME%\llvm\llvm"
-
-ninja sycl-toolchain
-```
 
 TODO: add instructions how to deploy built SYCL toolchain.
 
@@ -180,25 +154,7 @@ ln -s /opt/intel/tbb/lib/intel64/gcc4.8/libtbbmalloc.so
 echo /opt/intel/oclcpuexp/x64 > /etc/ld.so.conf.d/libintelopenclexp.conf
 ldconfig -f /etc/ld.so.conf.d/libintelopenclexp.conf
 ```
-**Windows (64-bit)**
-1) If you need `GPU` as well, then update/install it first. Do it **before**
-installing `CPU` runtime as `GPU` runtime installer may re-write some important
-files or settings and make existing `CPU` runtime not working properly.
 
-2) Extract the archive to some folder. For example, to `c:\oclcpu_rt_<new_version>`
-and `c:\tbb2019_<version>oss`.
-
-3) Run `Command Prompt` as `Administrator`. To do that click `Start` button,
-type `Command Prompt`, click the Right mouse button on it, then click
-`Run As Administrator`, then click `Yes` to confirm.
-
-4) In the opened windows run `install.bat` provided with the extracted files
-to install runtime to the system and setup environment variables. So, if the
-extracted files are in `c:\oclcpu_rt_<new_version>\` folder, then type the
-command:
-```bash
-c:\oclcpu_rt_<new_version>\install.bat c:\tbb2019_<version>oss\bin\intel64\vc14
-```
 
 ## Test SYCL toolchain
 
@@ -211,10 +167,7 @@ To verify that built SYCL toolchain is working correctly, run:
 make -j`nproc` check-all
 ```
 
-**Windows (64-bit)**
-```bat
-ninja check-all
-```
+
 
 If no OpenCL GPU/CPU runtimes are available, the corresponding tests are
 skipped.
@@ -237,10 +190,7 @@ To configure testing of "Intel SYCL" toochain set
 cmake -DIntel_SYCL_ROOT=$SYCL_HOME/deploy -DSYCL_IMPLEMENTATION=Intel_SYCL ...
 ```
 
-**Windows (64-bit)**
-```bat
-cmake -DIntel_SYCL_ROOT=%SYCL_HOME%\deploy -DSYCL_IMPLEMENTATION=Intel_SYCL ...
-```
+
 
 ### Build Doxygen documentation
 
@@ -328,11 +278,7 @@ export PATH=$SYCL_HOME/build/bin:$PATH
 export LD_LIBRARY_PATH=$SYCL_HOME/build/lib:$LD_LIBRARY_PATH
 ```
 
-**Windows (64-bit)**
-```bat
-set PATH=%SYCL_HOME%\build\bin;%PATH%
-set LIB=%SYCL_HOME%\build\lib;%LIB%
-```
+
 
 and run following command:
 
@@ -344,7 +290,7 @@ This `simple-sycl-app.exe` application doesn't specify SYCL device for
 execution, so SYCL runtime will use `default_selector` logic to select one
 of accelerators available in the system or SYCL host device.
 
-**Linux & Windows**
+**Linux**
 ```bash
 ./simple-sycl-app.exe
 The results are correct!
