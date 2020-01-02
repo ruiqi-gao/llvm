@@ -52,7 +52,7 @@ mkdir $SYCL_HOME
 **Linux**
 ```bash
 cd $SYCL_HOME
-git clone https://gitlab.devtools.intel.com/shqa/llvm.git -b jupyter-patch
+git clone https://github.com/ruiqi-gao/llvm.git -b jupyter-patch
 mkdir $SYCL_HOME/build
 cd $SYCL_HOME/build
 
